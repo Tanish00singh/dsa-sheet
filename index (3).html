@@ -1,0 +1,369 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+:root {
+  --g: #1a1a2e;
+  --g2: #16213e;
+  --card: #0f3460;
+  --accent: #e94560;
+  --gold: #f5a623;
+  --green: #00d4aa;
+  --text: #eaeaea;
+  --muted: #8892b0;
+  --solved: #00d4aa22;
+  --solved-border: #00d4aa;
+}
+.wrap { background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0d1b2a 100%); min-height: 100vh; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); }
+.hdr { background: linear-gradient(90deg, #0f3460, #533483); padding: 24px 20px 16px; border-bottom: 1px solid #e9456030; }
+.hdr h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; color: #fff; }
+.hdr p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.stats { display: flex; gap: 16px; margin: 12px 20px 0; flex-wrap: wrap; }
+.stat { background: #ffffff10; border: 1px solid #ffffff20; border-radius: 8px; padding: 8px 16px; font-size: 12px; color: var(--muted); }
+.stat span { color: var(--gold); font-size: 18px; font-weight: 700; display: block; }
+.search { margin: 16px 20px 8px; }
+.search input { width: 100%; background: #ffffff10; border: 1px solid #ffffff20; border-radius: 8px; padding: 10px 16px; color: var(--text); font-size: 14px; outline: none; }
+.search input:focus { border-color: var(--accent); }
+.search input::placeholder { color: var(--muted); }
+.topics { padding: 8px 20px 24px; }
+.topic-card { background: linear-gradient(135deg, #0f3460cc, #1a1a2ecc); border: 1px solid #ffffff15; border-radius: 12px; margin-bottom: 10px; overflow: hidden; transition: border-color 0.2s; }
+.topic-card:hover { border-color: #e9456040; }
+.topic-card.open { border-color: var(--accent); }
+.topic-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; user-select: none; }
+.topic-num { background: linear-gradient(135deg, var(--accent), #533483); color: #fff; font-weight: 700; font-size: 11px; min-width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.topic-title { flex: 1; font-size: 14px; font-weight: 600; color: #fff; }
+.topic-prog { font-size: 12px; color: var(--muted); margin-right: 8px; }
+.topic-prog .done { color: var(--green); font-weight: 700; }
+.chevron { color: var(--muted); font-size: 10px; transition: transform 0.3s; }
+.open .chevron { transform: rotate(180deg); }
+.prog-bar-wrap { height: 3px; background: #ffffff10; border-radius: 2px; width: 60px; margin-right: 8px; }
+.prog-bar { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.3s; }
+.problems { display: none; padding: 0 16px 16px; border-top: 1px solid #ffffff10; }
+.open .problems { display: block; }
+.prob { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #ffffff08; }
+.prob:last-child { border-bottom: none; }
+.prob-check { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid #ffffff30; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.prob-check.checked { background: var(--green); border-color: var(--green); }
+.prob-check.checked::after { content: '✓'; font-size: 11px; color: #fff; font-weight: 700; }
+.prob-info { flex: 1; min-width: 0; }
+.prob-name { font-size: 13px; color: #dde; font-weight: 500; line-height: 1.3; }
+.prob-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; flex-wrap: wrap; }
+.diff { font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 600; letter-spacing: 0.5px; }
+.diff.med { background: #f5a62325; color: var(--gold); border: 1px solid #f5a62340; }
+.plat { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.plat.lc { background: #f8931425; color: #f89314; border: 1px solid #f8931440; }
+.plat.cf { background: #1c6be125; color: #5c9cf5; border: 1px solid #1c6be140; }
+.plat.cc { background: #d3002025; color: #ff6b6b; border: 1px solid #d3002040; }
+.prob-link { color: var(--green); font-size: 11px; text-decoration: none; padding: 4px 10px; border: 1px solid var(--green)30; border-radius: 5px; white-space: nowrap; transition: all 0.2s; }
+.prob-link:hover { background: var(--green); color: #000; }
+.free-badge { font-size: 9px; background: #00d4aa15; color: var(--green); border: 1px solid #00d4aa30; border-radius: 3px; padding: 1px 5px; }
+</style>
+
+<div class="wrap">
+<div class="hdr">
+  <h1>⚡ DSA FAANG Roadmap Tracker</h1>
+  <p>25 must-know coding patterns · 150 FAANG interview problems · all free to solve</p>
+</div>
+<div class="stats">
+  <div class="stat"><span id="s-solved">0</span>solved</div>
+  <div class="stat"><span id="s-total">150</span>total</div>
+  <div class="stat"><span id="s-pct">0%</span>progress</div>
+  <div class="stat"><span id="s-topics">0/25</span>topics done</div>
+</div>
+<div class="search"><input placeholder="Search topics or problems..." id="searchInput" oninput="doSearch(this.value)"></div>
+<div class="topics" id="topicsContainer"></div>
+</div>
+
+<script>
+const DATA = [
+  { t: "Two Pointers", problems: [
+    { n: "3Sum", d: "med", p: "lc", url: "https://leetcode.com/problems/3sum/" },
+    { n: "Container With Most Water", d: "med", p: "lc", url: "https://leetcode.com/problems/container-with-most-water/" },
+    { n: "Trapping Rain Water", d: "med", p: "lc", url: "https://leetcode.com/problems/trapping-rain-water/" },
+    { n: "Remove Duplicates from Sorted Array", d: "med", p: "lc", url: "https://leetcode.com/problems/remove-duplicates-from-sorted-array/" },
+    { n: "Sort Colors (Dutch National Flag)", d: "med", p: "lc", url: "https://leetcode.com/problems/sort-colors/" },
+    { n: "Pair With Given Sum (Two Sum - Sorted)", d: "med", p: "lc", url: "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/" }
+  ]},
+  { t: "Sliding Window", problems: [
+    { n: "Longest Substring Without Repeating Characters", d: "med", p: "lc", url: "https://leetcode.com/problems/longest-substring-without-repeating-characters/" },
+    { n: "Minimum Size Subarray Sum", d: "med", p: "lc", url: "https://leetcode.com/problems/minimum-size-subarray-sum/" },
+    { n: "Fruit Into Baskets", d: "med", p: "lc", url: "https://leetcode.com/problems/fruit-into-baskets/" },
+    { n: "Maximum Average Subarray I", d: "med", p: "lc", url: "https://leetcode.com/problems/maximum-average-subarray-i/" },
+    { n: "Permutation in String", d: "med", p: "lc", url: "https://leetcode.com/problems/permutation-in-string/" },
+    { n: "Longest Repeating Character Replacement", d: "med", p: "lc", url: "https://leetcode.com/problems/longest-repeating-character-replacement/" }
+  ]},
+  { t: "Prefix Sums", problems: [
+    { n: "Subarray Sum Equals K", d: "med", p: "lc", url: "https://leetcode.com/problems/subarray-sum-equals-k/" },
+    { n: "Range Sum Query - Immutable", d: "med", p: "lc", url: "https://leetcode.com/problems/range-sum-query-immutable/" },
+    { n: "Product of Array Except Self", d: "med", p: "lc", url: "https://leetcode.com/problems/product-of-array-except-self/" },
+    { n: "Contiguous Array (Equal 0s and 1s)", d: "med", p: "lc", url: "https://leetcode.com/problems/contiguous-array/" },
+    { n: "Find Pivot Index", d: "med", p: "lc", url: "https://leetcode.com/problems/find-pivot-index/" },
+    { n: "Number of Ways to Split Array", d: "med", p: "lc", url: "https://leetcode.com/problems/number-of-ways-to-split-array/" }
+  ]},
+  { t: "Merge Intervals", problems: [
+    { n: "Merge Intervals", d: "med", p: "lc", url: "https://leetcode.com/problems/merge-intervals/" },
+    { n: "Insert Interval", d: "med", p: "lc", url: "https://leetcode.com/problems/insert-interval/" },
+    { n: "Non-overlapping Intervals", d: "med", p: "lc", url: "https://leetcode.com/problems/non-overlapping-intervals/" },
+    { n: "Meeting Rooms II", d: "med", p: "lc", url: "https://leetcode.com/problems/meeting-rooms-ii/" },
+    { n: "Minimum Number of Arrows to Burst Balloons", d: "med", p: "lc", url: "https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/" },
+    { n: "Task Scheduler", d: "med", p: "lc", url: "https://leetcode.com/problems/task-scheduler/" }
+  ]},
+  { t: "Binary Search (& Variants)", problems: [
+    { n: "Search in Rotated Sorted Array", d: "med", p: "lc", url: "https://leetcode.com/problems/search-in-rotated-sorted-array/" },
+    { n: "Find Minimum in Rotated Sorted Array", d: "med", p: "lc", url: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/" },
+    { n: "Koko Eating Bananas", d: "med", p: "lc", url: "https://leetcode.com/problems/koko-eating-bananas/" },
+    { n: "Find First and Last Position of Element", d: "med", p: "lc", url: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/" },
+    { n: "Capacity To Ship Packages Within D Days", d: "med", p: "lc", url: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/" },
+    { n: "Peak Index in a Mountain Array", d: "med", p: "lc", url: "https://leetcode.com/problems/peak-index-in-a-mountain-array/" }
+  ]},
+  { t: "Sorting-Based Patterns", problems: [
+    { n: "Kth Largest Element in an Array", d: "med", p: "lc", url: "https://leetcode.com/problems/kth-largest-element-in-an-array/" },
+    { n: "Top K Frequent Elements", d: "med", p: "lc", url: "https://leetcode.com/problems/top-k-frequent-elements/" },
+    { n: "Sort an Array (Merge Sort / Quick Sort)", d: "med", p: "lc", url: "https://leetcode.com/problems/sort-an-array/" },
+    { n: "Relative Sort Array", d: "med", p: "lc", url: "https://leetcode.com/problems/relative-sort-array/" },
+    { n: "Largest Number", d: "med", p: "lc", url: "https://leetcode.com/problems/largest-number/" },
+    { n: "Sort Characters By Frequency", d: "med", p: "lc", url: "https://leetcode.com/problems/sort-characters-by-frequency/" }
+  ]},
+  { t: "Fast and Slow Pointers", problems: [
+    { n: "Linked List Cycle", d: "med", p: "lc", url: "https://leetcode.com/problems/linked-list-cycle/" },
+    { n: "Find the Duplicate Number", d: "med", p: "lc", url: "https://leetcode.com/problems/find-the-duplicate-number/" },
+    { n: "Middle of the Linked List", d: "med", p: "lc", url: "https://leetcode.com/problems/middle-of-the-linked-list/" },
+    { n: "Happy Number", d: "med", p: "lc", url: "https://leetcode.com/problems/happy-number/" },
+    { n: "Reorder List", d: "med", p: "lc", url: "https://leetcode.com/problems/reorder-list/" },
+    { n: "Palindrome Linked List", d: "med", p: "lc", url: "https://leetcode.com/problems/palindrome-linked-list/" }
+  ]},
+  { t: "Backtracking & Recursive Search", problems: [
+    { n: "Subsets", d: "med", p: "lc", url: "https://leetcode.com/problems/subsets/" },
+    { n: "Permutations", d: "med", p: "lc", url: "https://leetcode.com/problems/permutations/" },
+    { n: "Combination Sum", d: "med", p: "lc", url: "https://leetcode.com/problems/combination-sum/" },
+    { n: "Letter Combinations of a Phone Number", d: "med", p: "lc", url: "https://leetcode.com/problems/letter-combinations-of-a-phone-number/" },
+    { n: "Word Search", d: "med", p: "lc", url: "https://leetcode.com/problems/word-search/" },
+    { n: "Generate Parentheses", d: "med", p: "lc", url: "https://leetcode.com/problems/generate-parentheses/" }
+  ]},
+  { t: "Divide and Conquer", problems: [
+    { n: "Sort List (Merge Sort on Linked List)", d: "med", p: "lc", url: "https://leetcode.com/problems/sort-list/" },
+    { n: "Majority Element", d: "med", p: "lc", url: "https://leetcode.com/problems/majority-element/" },
+    { n: "Maximum Subarray (Divide & Conquer)", d: "med", p: "lc", url: "https://leetcode.com/problems/maximum-subarray/" },
+    { n: "Kth Largest Element (QuickSelect)", d: "med", p: "lc", url: "https://leetcode.com/problems/kth-largest-element-in-an-array/" },
+    { n: "Expression Add Operators", d: "med", p: "lc", url: "https://leetcode.com/problems/expression-add-operators/" },
+    { n: "Count of Smaller Numbers After Self", d: "med", p: "lc", url: "https://leetcode.com/problems/count-of-smaller-numbers-after-self/" }
+  ]},
+  { t: "Linked List Techniques", problems: [
+    { n: "Reverse Linked List", d: "med", p: "lc", url: "https://leetcode.com/problems/reverse-linked-list/" },
+    { n: "Merge Two Sorted Lists", d: "med", p: "lc", url: "https://leetcode.com/problems/merge-two-sorted-lists/" },
+    { n: "Remove Nth Node From End of List", d: "med", p: "lc", url: "https://leetcode.com/problems/remove-nth-node-from-end-of-list/" },
+    { n: "Add Two Numbers", d: "med", p: "lc", url: "https://leetcode.com/problems/add-two-numbers/" },
+    { n: "LRU Cache (LinkedList + HashMap)", d: "med", p: "lc", url: "https://leetcode.com/problems/lru-cache/" },
+    { n: "Copy List with Random Pointer", d: "med", p: "lc", url: "https://leetcode.com/problems/copy-list-with-random-pointer/" }
+  ]},
+  { t: "Stacks and Queues", problems: [
+    { n: "Valid Parentheses", d: "med", p: "lc", url: "https://leetcode.com/problems/valid-parentheses/" },
+    { n: "Min Stack", d: "med", p: "lc", url: "https://leetcode.com/problems/min-stack/" },
+    { n: "Implement Queue using Stacks", d: "med", p: "lc", url: "https://leetcode.com/problems/implement-queue-using-stacks/" },
+    { n: "Decode String", d: "med", p: "lc", url: "https://leetcode.com/problems/decode-string/" },
+    { n: "Daily Temperatures", d: "med", p: "lc", url: "https://leetcode.com/problems/daily-temperatures/" },
+    { n: "Asteroid Collision", d: "med", p: "lc", url: "https://leetcode.com/problems/asteroid-collision/" }
+  ]},
+  { t: "Monotonic Stack / Queue", problems: [
+    { n: "Next Greater Element I", d: "med", p: "lc", url: "https://leetcode.com/problems/next-greater-element-i/" },
+    { n: "Next Greater Element II (Circular)", d: "med", p: "lc", url: "https://leetcode.com/problems/next-greater-element-ii/" },
+    { n: "Largest Rectangle in Histogram", d: "med", p: "lc", url: "https://leetcode.com/problems/largest-rectangle-in-histogram/" },
+    { n: "Sliding Window Maximum", d: "med", p: "lc", url: "https://leetcode.com/problems/sliding-window-maximum/" },
+    { n: "Sum of Subarray Minimums", d: "med", p: "lc", url: "https://leetcode.com/problems/sum-of-subarray-minimums/" },
+    { n: "Remove K Digits", d: "med", p: "lc", url: "https://leetcode.com/problems/remove-k-digits/" }
+  ]},
+  { t: "Expression Evaluation", problems: [
+    { n: "Evaluate Reverse Polish Notation", d: "med", p: "lc", url: "https://leetcode.com/problems/evaluate-reverse-polish-notation/" },
+    { n: "Basic Calculator II", d: "med", p: "lc", url: "https://leetcode.com/problems/basic-calculator-ii/" },
+    { n: "Decode Ways", d: "med", p: "lc", url: "https://leetcode.com/problems/decode-ways/" },
+    { n: "Number of Atoms", d: "med", p: "lc", url: "https://leetcode.com/problems/number-of-atoms/" },
+    { n: "Simplify Path", d: "med", p: "lc", url: "https://leetcode.com/problems/simplify-path/" },
+    { n: "Calculate Expression with Precedence", d: "med", p: "cf", url: "https://codeforces.com/problemset/problem/590/A" }
+  ]},
+  { t: "String Manipulation", problems: [
+    { n: "Longest Palindromic Substring", d: "med", p: "lc", url: "https://leetcode.com/problems/longest-palindromic-substring/" },
+    { n: "Group Anagrams", d: "med", p: "lc", url: "https://leetcode.com/problems/group-anagrams/" },
+    { n: "Minimum Window Substring", d: "med", p: "lc", url: "https://leetcode.com/problems/minimum-window-substring/" },
+    { n: "Longest Common Prefix", d: "med", p: "lc", url: "https://leetcode.com/problems/longest-common-prefix/" },
+    { n: "String to Integer (atoi)", d: "med", p: "lc", url: "https://leetcode.com/problems/string-to-integer-atoi/" },
+    { n: "Zigzag Conversion", d: "med", p: "lc", url: "https://leetcode.com/problems/zigzag-conversion/" }
+  ]},
+  { t: "Hashmaps & Frequency Counting", problems: [
+    { n: "Two Sum", d: "med", p: "lc", url: "https://leetcode.com/problems/two-sum/" },
+    { n: "Ransom Note", d: "med", p: "lc", url: "https://leetcode.com/problems/ransom-note/" },
+    { n: "Isomorphic Strings", d: "med", p: "lc", url: "https://leetcode.com/problems/isomorphic-strings/" },
+    { n: "Longest Consecutive Sequence", d: "med", p: "lc", url: "https://leetcode.com/problems/longest-consecutive-sequence/" },
+    { n: "4Sum II", d: "med", p: "lc", url: "https://leetcode.com/problems/4sum-ii/" },
+    { n: "Subarray Sum Divisible by K", d: "med", p: "lc", url: "https://leetcode.com/problems/subarray-sums-divisible-by-k/" }
+  ]},
+  { t: "Binary Trees & BSTs", problems: [
+    { n: "Binary Tree Level Order Traversal", d: "med", p: "lc", url: "https://leetcode.com/problems/binary-tree-level-order-traversal/" },
+    { n: "Validate Binary Search Tree", d: "med", p: "lc", url: "https://leetcode.com/problems/validate-binary-search-tree/" },
+    { n: "Lowest Common Ancestor of BST", d: "med", p: "lc", url: "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/" },
+    { n: "Binary Tree Right Side View", d: "med", p: "lc", url: "https://leetcode.com/problems/binary-tree-right-side-view/" },
+    { n: "Construct Binary Tree from Preorder and Inorder", d: "med", p: "lc", url: "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" },
+    { n: "Kth Smallest Element in BST", d: "med", p: "lc", url: "https://leetcode.com/problems/kth-smallest-element-in-a-bst/" }
+  ]},
+  { t: "Path Sum & Root-to-Leaf", problems: [
+    { n: "Path Sum II", d: "med", p: "lc", url: "https://leetcode.com/problems/path-sum-ii/" },
+    { n: "Binary Tree Maximum Path Sum", d: "med", p: "lc", url: "https://leetcode.com/problems/binary-tree-maximum-path-sum/" },
+    { n: "Sum Root to Leaf Numbers", d: "med", p: "lc", url: "https://leetcode.com/problems/sum-root-to-leaf-numbers/" },
+    { n: "Diameter of Binary Tree", d: "med", p: "lc", url: "https://leetcode.com/problems/diameter-of-binary-tree/" },
+    { n: "Path Sum III", d: "med", p: "lc", url: "https://leetcode.com/problems/path-sum-iii/" },
+    { n: "Longest Univalue Path", d: "med", p: "lc", url: "https://leetcode.com/problems/longest-univalue-path/" }
+  ]},
+  { t: "Kth Largest/Smallest (Heaps)", problems: [
+    { n: "Kth Largest Element in a Stream", d: "med", p: "lc", url: "https://leetcode.com/problems/kth-largest-element-in-a-stream/" },
+    { n: "Find K Closest Elements", d: "med", p: "lc", url: "https://leetcode.com/problems/find-k-closest-elements/" },
+    { n: "K Closest Points to Origin", d: "med", p: "lc", url: "https://leetcode.com/problems/k-closest-points-to-origin/" },
+    { n: "Find Median from Data Stream", d: "med", p: "lc", url: "https://leetcode.com/problems/find-median-from-data-stream/" },
+    { n: "Reorganize String", d: "med", p: "lc", url: "https://leetcode.com/problems/reorganize-string/" },
+    { n: "IPO (Maximize Capital)", d: "med", p: "lc", url: "https://leetcode.com/problems/ipo/" }
+  ]},
+  { t: "Top K Frequent Elements", problems: [
+    { n: "Top K Frequent Elements", d: "med", p: "lc", url: "https://leetcode.com/problems/top-k-frequent-elements/" },
+    { n: "Top K Frequent Words", d: "med", p: "lc", url: "https://leetcode.com/problems/top-k-frequent-words/" },
+    { n: "Sort Array by Increasing Frequency", d: "med", p: "lc", url: "https://leetcode.com/problems/sort-array-by-increasing-frequency/" },
+    { n: "K-diff Pairs in an Array", d: "med", p: "lc", url: "https://leetcode.com/problems/k-diff-pairs-in-an-array/" },
+    { n: "Frequency Sort (CodeChef)", d: "med", p: "cc", url: "https://www.codechef.com/problems/FREQSORT" },
+    { n: "Almost Sorted (Codeforces)", d: "med", p: "cf", url: "https://codeforces.com/problemset/problem/660/C" }
+  ]},
+  { t: "Merge K Sorted Lists", problems: [
+    { n: "Merge K Sorted Lists", d: "med", p: "lc", url: "https://leetcode.com/problems/merge-k-sorted-lists/" },
+    { n: "Smallest Range Covering Elements from K Lists", d: "med", p: "lc", url: "https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/" },
+    { n: "Find K Pairs with Smallest Sums", d: "med", p: "lc", url: "https://leetcode.com/problems/find-k-pairs-with-smallest-sums/" },
+    { n: "Ugly Number II", d: "med", p: "lc", url: "https://leetcode.com/problems/ugly-number-ii/" },
+    { n: "Super Ugly Number", d: "med", p: "lc", url: "https://leetcode.com/problems/super-ugly-number/" },
+    { n: "Kth Smallest Element in a Sorted Matrix", d: "med", p: "lc", url: "https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/" }
+  ]},
+  { t: "Dynamic Programming", problems: [
+    { n: "House Robber", d: "med", p: "lc", url: "https://leetcode.com/problems/house-robber/" },
+    { n: "Longest Increasing Subsequence", d: "med", p: "lc", url: "https://leetcode.com/problems/longest-increasing-subsequence/" },
+    { n: "Coin Change", d: "med", p: "lc", url: "https://leetcode.com/problems/coin-change/" },
+    { n: "Unique Paths", d: "med", p: "lc", url: "https://leetcode.com/problems/unique-paths/" },
+    { n: "Partition Equal Subset Sum", d: "med", p: "lc", url: "https://leetcode.com/problems/partition-equal-subset-sum/" },
+    { n: "Longest Common Subsequence", d: "med", p: "lc", url: "https://leetcode.com/problems/longest-common-subsequence/" }
+  ]},
+  { t: "Greedy & Interval Partitioning", problems: [
+    { n: "Jump Game", d: "med", p: "lc", url: "https://leetcode.com/problems/jump-game/" },
+    { n: "Jump Game II", d: "med", p: "lc", url: "https://leetcode.com/problems/jump-game-ii/" },
+    { n: "Gas Station", d: "med", p: "lc", url: "https://leetcode.com/problems/gas-station/" },
+    { n: "Partition Labels", d: "med", p: "lc", url: "https://leetcode.com/problems/partition-labels/" },
+    { n: "Queue Reconstruction by Height", d: "med", p: "lc", url: "https://leetcode.com/problems/queue-reconstruction-by-height/" },
+    { n: "Candy", d: "med", p: "lc", url: "https://leetcode.com/problems/candy/" }
+  ]},
+  { t: "Graph Traversals (BFS / DFS)", problems: [
+    { n: "Number of Islands", d: "med", p: "lc", url: "https://leetcode.com/problems/number-of-islands/" },
+    { n: "Clone Graph", d: "med", p: "lc", url: "https://leetcode.com/problems/clone-graph/" },
+    { n: "Rotting Oranges", d: "med", p: "lc", url: "https://leetcode.com/problems/rotting-oranges/" },
+    { n: "Course Schedule (Topological Sort)", d: "med", p: "lc", url: "https://leetcode.com/problems/course-schedule/" },
+    { n: "Pacific Atlantic Water Flow", d: "med", p: "lc", url: "https://leetcode.com/problems/pacific-atlantic-water-flow/" },
+    { n: "Word Ladder", d: "med", p: "lc", url: "https://leetcode.com/problems/word-ladder/" }
+  ]},
+  { t: "Graph Algorithms (MST, Shortest Paths)", problems: [
+    { n: "Network Delay Time (Dijkstra)", d: "med", p: "lc", url: "https://leetcode.com/problems/network-delay-time/" },
+    { n: "Cheapest Flights Within K Stops", d: "med", p: "lc", url: "https://leetcode.com/problems/cheapest-flights-within-k-stops/" },
+    { n: "Min Cost to Connect All Points (MST)", d: "med", p: "lc", url: "https://leetcode.com/problems/min-cost-to-connect-all-points/" },
+    { n: "Path With Minimum Effort", d: "med", p: "lc", url: "https://leetcode.com/problems/path-with-minimum-effort/" },
+    { n: "Number of Provinces (Union Find)", d: "med", p: "lc", url: "https://leetcode.com/problems/number-of-provinces/" },
+    { n: "Redundant Connection (Union Find)", d: "med", p: "lc", url: "https://leetcode.com/problems/redundant-connection/" }
+  ]},
+  { t: "Design Problems (LRU Cache)", problems: [
+    { n: "LRU Cache", d: "med", p: "lc", url: "https://leetcode.com/problems/lru-cache/" },
+    { n: "LFU Cache", d: "med", p: "lc", url: "https://leetcode.com/problems/lfu-cache/" },
+    { n: "Design Twitter", d: "med", p: "lc", url: "https://leetcode.com/problems/design-twitter/" },
+    { n: "Design Hit Counter", d: "med", p: "lc", url: "https://leetcode.com/problems/design-hit-counter/" },
+    { n: "Time Based Key-Value Store", d: "med", p: "lc", url: "https://leetcode.com/problems/time-based-key-value-store/" },
+    { n: "Design Add and Search Words Data Structure", d: "med", p: "lc", url: "https://leetcode.com/problems/design-add-and-search-words-data-structure/" }
+  ]}
+];
+
+const solved = JSON.parse(localStorage.getItem('dsa_solved') || '{}');
+
+function save() { try { localStorage.setItem('dsa_solved', JSON.stringify(solved)); } catch(e) {} }
+
+function updateStats() {
+  let total = 0, done = 0, topicsDone = 0;
+  DATA.forEach((t, ti) => {
+    let td = 0;
+    t.problems.forEach((_, pi) => {
+      total++;
+      if (solved[ti + '-' + pi]) { done++; td++; }
+    });
+    if (td === t.problems.length) topicsDone++;
+  });
+  document.getElementById('s-solved').textContent = done;
+  document.getElementById('s-pct').textContent = Math.round(done / total * 100) + '%';
+  document.getElementById('s-topics').textContent = topicsDone + '/25';
+}
+
+function platLabel(p) {
+  if (p === 'lc') return '<span class="plat lc">LeetCode</span>';
+  if (p === 'cf') return '<span class="plat cf">Codeforces</span>';
+  return '<span class="plat cc">CodeChef</span>';
+}
+
+function render(filter) {
+  const c = document.getElementById('topicsContainer');
+  c.innerHTML = '';
+  DATA.forEach((topic, ti) => {
+    const probs = filter ? topic.problems.filter(p => p.n.toLowerCase().includes(filter) || topic.t.toLowerCase().includes(filter)) : topic.problems;
+    if (filter && probs.length === 0) return;
+    const doneCount = topic.problems.filter((_, pi) => solved[ti + '-' + pi]).length;
+    const pct = Math.round(doneCount / topic.problems.length * 100);
+    const card = document.createElement('div');
+    card.className = 'topic-card';
+    card.innerHTML = `
+      <div class="topic-header" onclick="toggle(this.parentElement)">
+        <div class="topic-num">${ti + 1}</div>
+        <div class="topic-title">${topic.t}</div>
+        <div class="prog-bar-wrap"><div class="prog-bar" style="width:${pct}%"></div></div>
+        <div class="topic-prog"><span class="done">${doneCount}</span>/${topic.problems.length}</div>
+        <div class="chevron">▼</div>
+      </div>
+      <div class="problems">
+        ${(filter ? probs : topic.problems).map((p, pi) => {
+          const realPi = filter ? topic.problems.indexOf(p) : pi;
+          const key = ti + '-' + realPi;
+          const isChecked = solved[key] ? 'checked' : '';
+          return `<div class="prob" id="prob-${ti}-${realPi}">
+            <div class="prob-check ${isChecked}" onclick="toggleSolve(${ti},${realPi},this)"></div>
+            <div class="prob-info">
+              <div class="prob-name">${p.n}</div>
+              <div class="prob-meta">
+                <span class="diff med">Medium</span>
+                ${platLabel(p.p)}
+                <span class="free-badge">FREE</span>
+              </div>
+            </div>
+            <a class="prob-link" href="${p.url}" target="_blank">Solve →</a>
+          </div>`;
+        }).join('')}
+      </div>`;
+    c.appendChild(card);
+    if (filter) card.classList.add('open');
+  });
+}
+
+function toggle(card) { card.classList.toggle('open'); }
+
+function toggleSolve(ti, pi, el) {
+  const key = ti + '-' + pi;
+  if (solved[key]) { delete solved[key]; el.classList.remove('checked'); }
+  else { solved[key] = 1; el.classList.add('checked'); }
+  save();
+  updateStats();
+  const card = el.closest('.topic-card');
+  const idx = DATA.findIndex((_, i) => card.querySelector('.topic-num').textContent == i + 1);
+  const realTi = parseInt(el.closest('.topic-card').querySelector('.topic-num').textContent) - 1;
+  const doneCount = DATA[realTi].problems.filter((_, pi2) => solved[realTi + '-' + pi2]).length;
+  const pct = Math.round(doneCount / DATA[realTi].problems.length * 100);
+  card.querySelector('.prog-bar').style.width = pct + '%';
+  card.querySelector('.done').textContent = doneCount;
+}
+
+function doSearch(v) { render(v.toLowerCase().trim()); }
+
+render();
+updateStats();
+</script>
